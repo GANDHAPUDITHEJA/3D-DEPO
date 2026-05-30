@@ -400,9 +400,9 @@ import re
 from neo4j import GraphDatabase
 
 def neo4j_push(graph_data):
-    NEO4J_URI      = "neo4j+s://aae46cce.databases.neo4j.io"
-    NEO4J_USER     = "neo4j"          # ← Aura default username, not the instance ID
-    NEO4J_PASSWORD = "f391518YvUrHECPyiP8BXzcWFBO6ja3vW_W6B-wutKY"
+    NEO4J_URI      = ""
+    NEO4J_USER     = ""          # ← Aura default username, not the instance ID
+    NEO4J_PASSWORD = ""
 
     cypher_text = re.sub(r'cy-keyword">', '', graph_data["cypher"])
     cypher_text = re.sub(r'cy-label">',   '', cypher_text)
