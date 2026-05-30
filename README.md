@@ -21,7 +21,8 @@
 - **Neo4j Cypher Script** — ready-to-paste `MERGE` statements for Neo4j Browser
 - **Pipeline Figure** — 6-panel matplotlib summary image (PNG)
 
-The companion frontend (`draw_cloud_v2.html`) is a zero-dependency SPA with a Three.js 3D viewer and D3 force-directed graph — no build step required.
+The companion frontend (`3D-DEPO.html`) is a zero-dependency SPA with a Three.js 3D viewer and D3 force-directed graph — no build step required.
+
 
 ---
 
@@ -51,13 +52,13 @@ pip install -r requirements.txt
 **2 · Start the API**
 
 ```bash
-python api_v2.py
+python api_v1.py
 # → Serving on http://0.0.0.0:5000
 ```
 
 **3 · Open the UI**
 
-Open `draw_cloud_v2.html` directly in your browser — no server needed. Point the **API** field at `http://localhost:5000`.
+Open `3D-DEPO.html` directly in your browser — no server needed. Point the **API** field at `http://localhost:5000`.
 
 ---
 
@@ -140,8 +141,8 @@ Smart Crop → Annotation Removal → Binarize → Contour Extraction
 
 ```
 3D-DEPO/
-├── api_v2.py              # Flask API server — full CV + 3D pipeline
-├── draw_cloud_v2.html     # Frontend SPA — Three.js viewer + D3 graph
+├── api_v1.py              # Flask API server — full CV + 3D pipeline
+├── 3D-DEPO.html     # Frontend SPA — Three.js viewer + D3 graph
 ├── requirements.txt       # Python dependencies
 └── README.md
 ```
@@ -171,7 +172,7 @@ Frontend CDN libraries (no install needed):
 
 ## Configuration
 
-Global tuning constants at the top of `api_v2.py`:
+Global tuning constants at the top of `api_v1.py`:
 
 ```python
 _D = dict(
@@ -188,7 +189,7 @@ _D = dict(
 
 **Before deploying to any non-local environment:**
 
-- **Rotate your Neo4j Aura password.** The current code contains hardcoded credentials in `api_v2.py`. Move them to environment variables:
+- **Rotate your Neo4j Aura password.** The current code contains hardcoded credentials in `api_v1.py`. Move them to environment variables:
 
 ```python
 import os
