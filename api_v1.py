@@ -207,12 +207,10 @@ def fill(outer_rs, holes_rs, sp):
     mn = outer_rs.min(0)
     mx = outer_rs.max(0)
 
-    # Mask at exactly sp resolution (1 pixel = 1 sample point)
     res = sp
     W   = int((mx[0]-mn[0])/res) + 4
     H   = int((mx[1]-mn[1])/res) + 4
 
-    # Guard against ridiculous sizes
     if W*H > 20_000_000:
         res = sp * 2
         W   = int((mx[0]-mn[0])/res) + 4
@@ -226,7 +224,6 @@ def fill(outer_rs, holes_rs, sp):
         p[:,1] = np.clip(p[:,1], 0, H-1)
         return p
 
-    # Paint outer profile white, then subtract holes
     cv2.fillPoly(mask, [to_px(outer_rs)], 255)
     for h in holes_rs:
         if len(h) >= 3:
@@ -400,16 +397,19 @@ import re
 from neo4j import GraphDatabase
 
 def neo4j_push(graph_data):
-    NEO4J_URI      = ""
-    NEO4J_USER     = ""          # ← Aura default username, not the instance ID
-    NEO4J_PASSWORD = ""
+    NEO4J_URI      = os.environ.get("NEO4J_URI", "")
+    NEO4J_USER     = os.environ.get("NEO4J_USER", "")
+    NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "")
+
+    if not NEO4J_URI or not NEO4J_PASSWORD:
+        print("Neo4j credentials not set — skipping push")
+        return
 
     cypher_text = re.sub(r'cy-keyword">', '', graph_data["cypher"])
     cypher_text = re.sub(r'cy-label">',   '', cypher_text)
 
     stmts = []
     for stmt in cypher_text.split(";"):
-        # Strip comment lines individually
         stmt = "\n".join(
             line for line in stmt.splitlines()
             if not line.strip().startswith("//")
@@ -646,6 +646,19 @@ def pipeline_image(region, cleaned, binary, bname, outer_c, hole_cs,
 #  ROUTES
 # ═══════════════════════════════════════════════════════════════
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "name":    "3D-DEPO API",
+        "version": "v1",
+        "status":  "running",
+        "endpoints": {
+            "GET  /health":  "Health check",
+            "GET  /ping":    "Liveness probe",
+            "POST /process": "2D drawing → 3D point cloud"
+        }
+    })
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status":"ok","version":"3D-DEPO-v1"})
@@ -681,7 +694,7 @@ def process():
         outer_rs              = resample(outer_mm, density)
         holes_rs              = [resample(h, density) for h in holes_mm]
         boundary              = np.vstack([outer_rs]+holes_rs)
-        interior              = fill(outer_rs, holes_rs, density)   # ← fixed
+        interior              = fill(outer_rs, holes_rs, density)
         xyz                   = extrude(boundary, interior, holes_rs, thickness, layers)
         xyz                   = voxel(xyz, density*_D["voxel_frac"])
         pcd                   = normals(xyz)
@@ -692,8 +705,7 @@ def process():
                                        bname, view, density, layers)
         graph_data = build_knowledge_graph(anns, bbox_mm, thickness,
                                            part_name, tb["drawing_no"])
-        neo4j_push(graph_data)   
-        # ← uncomment + fill credentials to enable
+        neo4j_push(graph_data)
 
         png = pipeline_image(region, cleaned, binary, bname,
                              outer_c, hole_cs, outer_rs, holes_rs,
@@ -745,5 +757,6 @@ def process():
 
 
 if __name__ == "__main__":
-    print("3D-DEPO API v1  →  http://0.0.0.0:5000")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"3D-DEPO API v1  →  http://0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port, debug=False)
