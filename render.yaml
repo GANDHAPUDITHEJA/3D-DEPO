@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: drawcloud-api
+    runtime: python
+    region: singapore
+    plan: free
+
+    buildCommand: pip install -r requirements.txt && pip install neo4j flask-cors
+
+    startCommand: python api_v1.py
+
+    envVars:
+      - key: NEO4J_URI
+        sync: false          # set manually in Render dashboard
+
+      - key: NEO4J_USER
+        sync: false          # set manually in Render dashboard
+
+      - key: NEO4J_PASSWORD
+        sync: false          # set manually in Render dashboard
+
+      - key: PYTHON_VERSION
+        value: 3.10.13
+
+      - key: PORT
+        value: 5000
+
+    healthCheckPath: /health
+
+    autoDeploy: true
