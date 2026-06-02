@@ -5,9 +5,9 @@ services:
     region: singapore
     plan: free
 
-    buildCommand: pip install -r requirements.txt && pip install neo4j flask-cors
+    buildCommand: pip install -r requirements.txt
 
-    startCommand: python api_v1.py
+    startCommand: python api_v2.py
 
     envVars:
       - key: NEO4J_URI
