@@ -7,7 +7,7 @@ services:
 
     buildCommand: pip install -r requirements.txt
 
-    startCommand: python api_v2.py
+    startCommand: python api_v1.py
 
     envVars:
       - key: NEO4J_URI
