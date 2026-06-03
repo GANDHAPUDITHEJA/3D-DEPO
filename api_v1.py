@@ -18,7 +18,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # noqa
 
 app  = Flask(__name__)
-CORS(app)
+CORS(app,
+     origins="*",
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+     methods=["GET", "POST", "OPTIONS"],
+     supports_credentials=False)
 
 _D = dict(min_hole_frac=0.0005, outer_frac=0.008,
           min_blob_frac=0.00005, voxel_frac=0.6)
@@ -666,6 +670,15 @@ def health():
 @app.route("/ping", methods=["GET"])
 def ping():
     return jsonify({"status":"ok"})
+
+@app.route("/process", methods=["OPTIONS"])
+def process_preflight():
+    from flask import make_response
+    resp = make_response()
+    resp.headers["Access-Control-Allow-Origin"]  = "*"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    resp.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    return resp, 204
 
 @app.route("/process", methods=["POST"])
 def process():

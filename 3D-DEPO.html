@@ -259,7 +259,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;height:4px;
   </div>
   <div class="api-row">
     <span class="api-label">API</span>
-    <input class="api-input" id="apiUrl" value="http://localhost:5000"/>
+    <input class="api-input" id="apiUrl" value="https://drawcloud-api.onrender.com" placeholder="https://drawcloud-api.onrender.com"/>
     <button class="ping-btn" id="apiStatus" onclick="pingAPI()">Ping</button>
   </div>
 </header>
@@ -519,13 +519,13 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;height:4px;
 // CORE STATE
 // ═══════════════════════════════════════════════════════════
 let file = null, _graphData = null;
-function getAPI(){ return (document.getElementById('apiUrl').value||'http://localhost:5000').replace(/\/+$/,''); }
+function getAPI(){ return (document.getElementById('apiUrl').value||'https://drawcloud-api.onrender.com').replace(/\/+$/,''); }
 
 async function pingAPI(){
   const el=document.getElementById('apiStatus');
   el.textContent='Pinging…';el.style.color='#d97706';
   try{
-    const r=await fetch(getAPI()+'/health',{signal:AbortSignal.timeout(3000)});
+    const r=await fetch(getAPI()+'/health',{signal:AbortSignal.timeout(35000)});
     el.textContent=r.ok?'● Online':'● Error '+r.status;
     el.style.color=r.ok?'#16a34a':'#dc2626';
   }catch{el.textContent='● Offline';el.style.color='#dc2626';}
